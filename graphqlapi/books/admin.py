@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import Book
+from .models import Book,Category,Ingredient,ExtendUser
 
 admin.site.register(Book)
+admin.site.register(Category)
+admin.site.register(Ingredient)
+admin.site.register(ExtendUser)
 # Register your models here.
