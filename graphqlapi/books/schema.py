@@ -1,11 +1,8 @@
-
-from logging import NOTSET
-from multiprocessing import managers
-from pyexpat import model
-from unicodedata import category, name
 import graphene
 from graphene_django import DjangoObjectType
 from .models import Book,Category,Ingredient
+from graphql_auth.schema import MeQuery,UserQuery
+from graphql_auth import mutations
 class BookType(DjangoObjectType):
     class Meta:
         model = Book
@@ -18,7 +15,7 @@ class IngredientType(DjangoObjectType):
     class Meta:
         model = Ingredient
         fields = ("id", "name", "notes", "category")
-class Query(graphene.ObjectType):
+class Query(UserQuery,MeQuery,graphene.ObjectType):
     mybook = graphene.List(BookType)
     bookauthor = graphene.List(BookType,author=graphene.String(required=True))
     all_ingredient = graphene.List(IngredientType)
@@ -65,9 +62,20 @@ class UpdateIngredient(graphene.Mutation):
         geting.category.id = category
         geting.save()
         return UpdateIngredient(update_ingr=geting)
-
-class Mutation(graphene.ObjectType):
+class AuthMutation(graphene.ObjectType):
+    register = mutations.Register.Field()
+    verify_account = mutations.VerifyAccount.Field()
+    token_auth = mutations.ObtainJSONWebToken.Field()
+    update_account = mutations.UpdateAccount.Field()
+    password_reset = mutations.PasswordReset.Field()
+    send_password_reset_email = mutations.SendPasswordResetEmail.Field()
+    password_reset = mutations.PasswordReset.Field()
+    delete_account = mutations.DeleteAccount.Field()
+    print("register",register)
+class Mutation(AuthMutation,graphene.ObjectType):
     edit_ingr = UpdateIngredient.Field()
+
+
 # class CategoryMutation(graphene.Mutation):
 #     class Arguments:
 #         id = graphene.ID()
